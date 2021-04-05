@@ -1,0 +1,41 @@
+<?php
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityInterface;
+
+function myAjaxCallBack(&$form, &$form_state) {
+	$value = rand(50000,60000);
+	$form['field_price']['widget'][0]['value']['#value'] = $value;
+	$form['field_price']['#prefix'] = "<div id='edit-field-price-wrapper'>";
+	$form['field_price']['#suffix'] = "</div>";	
+	return $form['field_price'];
+}
+
+function bitcoin_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'node_bitcoin_operation_form') {
+      $form['field_number']['widget'][0]['value']['#ajax'] = [
+	      'callback' => 'myAjaxCallBack',
+	      'disable-refocus' => FALSE,
+	      'event' => 'change',
+	      'wrapper' => 'edit-field-price-wrapper',
+	      'method' => 'replace'
+      ]; 
+  }
+}
+
+function bitcoin_node_presave(EntityInterface $entity) {
+	if ($entity->getEntityTypeId()=='node'){
+		if ($entity->bundle()=='bitcoin_operation'){
+	
+		$number = $entity->get('field_number')->getValue()[0]['value'];
+
+		$price = $entity->get('field_price')->getValue()[0]['value'];
+ 
+		$title = $number . ' x ' . '(' . $price . ')';
+		$entity->setTitle($title);
+		}
+	}
+}
+?>
+
+

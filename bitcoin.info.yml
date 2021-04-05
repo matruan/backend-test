@@ -1,0 +1,4 @@
+name: Bitcoin Custom Content Type Module
+description: Module for Bitcoin custom content type
+core_version_requirement: ^9
+type: module
